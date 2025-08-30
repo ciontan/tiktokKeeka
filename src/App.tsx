@@ -10,6 +10,7 @@ import platinumBg from "./assets/platinum.png";
 import bronzeBg from "./assets/bronze.png";
 import silverBg from "./assets/silver.png";
 import goldBg from "./assets/gold.png";
+import Popup from "./Popup.js";
 
 interface TikTokStats {
   followers: number;
@@ -44,14 +45,14 @@ const CREATOR_TIERS: CreatorTier[] = [
     name: "Silver",
     minFollowers: 1000,
     minLikes: 10000,
-    color: "silver-bg", 
+    color: "silver-bg",
     benefits: ["Silver badge", "Priority support"],
   },
   {
     name: "Gold",
     minFollowers: 10000,
     minLikes: 100000,
-    color: "gold-bg", 
+    color: "gold-bg",
     benefits: ["Gold badge", "Monetization tools"],
   },
   {
@@ -184,6 +185,8 @@ export function App() {
     verificationForm.fullName &&
     verificationForm.email &&
     verificationForm.category;
+
+  const [showPopup, setShowPopup] = useState(true);
 
   if (currentPage === "verification") {
     return (
@@ -332,8 +335,8 @@ export function App() {
 
             <view className="bg-blue-50 p-4 mt-2 rounded">
               <text className="text-sm text-blue-800">
-                We'll review your application within 24-48 hours. Make sure
-                all information is accurate.
+                We'll review your application within 24-48 hours. Make sure all
+                information is accurate.
               </text>
             </view>
           </view>
@@ -367,7 +370,7 @@ export function App() {
         </view>
         <view className="flex flex-col items-center justify-center gap-2 mb-2">
           <view className="flex flex-row">
-            <text className="text-xl font-bold">creator1</text>
+            <text className="text-xl font-bold text-black">creator1</text>
             {verificationStatus === "verified" && (
               <view className="flex items-center gap-1 px-2">
                 <image
@@ -381,12 +384,12 @@ export function App() {
         </view>
         <view className="flex justify-center gap-x-[50px] mb-6">
           <view className="flex flex-col items-center">
-            <text className="text-2xl font-bold">99</text>
+            <text className="text-2xl font-bold text-black">99</text>
             <text className="text-gray-400 text-sm">Following</text>
           </view>
           <view className="flex flex-col items-center">
             <text
-              className="text-2xl font-bold flex items-center gap-1 cursor-pointer"
+              className="text-2xl font-bold flex items-center gap-1 cursor-pointer text-black"
               bindtap={() => {
                 if (currentTier.name !== "Unverified" && nextTier) {
                   setTiktokStats((prev) => ({
@@ -402,7 +405,7 @@ export function App() {
           </view>
           <view className="flex flex-col items-center">
             <text
-              className="text-2xl font-bold flex items-center gap-1 cursor-pointer"
+              className="text-2xl text-black font-bold flex items-center gap-1 cursor-pointer"
               bindtap={() => {
                 if (currentTier.name !== "Unverified" && nextTier) {
                   setTiktokStats((prev) => ({
@@ -431,7 +434,9 @@ export function App() {
                   minHeight: "40px",
                 }}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             ) : currentTier.name === "Gold" ? (
               <view
@@ -445,7 +450,9 @@ export function App() {
                   minHeight: "40px",
                 }}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             ) : currentTier.name === "Bronze" ? (
               <view
@@ -459,7 +466,9 @@ export function App() {
                   minHeight: "40px",
                 }}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             ) : currentTier.name === "Silver" ? (
               <view
@@ -473,19 +482,25 @@ export function App() {
                   minHeight: "40px",
                 }}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             ) : currentTier.name === "Unverified" ? (
               <view
                 className={`${currentTier.color} font-bold px-2 py-1 rounded`}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             ) : (
               <view
                 className={`${currentTier.color} text-black font-bold px-2 py-1 rounded`}
               >
-                <text className="text-black font-bold">{currentTier.name} Creator</text>
+                <text className="text-black font-bold">
+                  {currentTier.name} Creator
+                </text>
               </view>
             )}
             {verificationStatus === "pending" && (
@@ -563,7 +578,60 @@ export function App() {
           </view>
         </view>
       </view>
+
+      {showPopup && (
+        <Popup
+          title="Introducing Karma Points"
+          onClose={() => setShowPopup(false)}
+        >
+          <view style={{ marginBottom: 32 }}>
+            <text className="block text-white text-base mb-4">
+              Turn your watch time into real support for creators.
+            </text>
+            <view className="space-y-4 text-left">
+              <view>
+                <text className="text-white font-bold">
+                  1. Your Daily Micro-Tipping Power:
+                </text>
+                <text className="pl-4 block text-white pb-4">
+                  You receive a small, daily allowance of Karma Points (e.g.,
+                  worth 1¢) that is automatically dedicated to supporting
+                  creators.
+                </text>
+              </view>
+              <view>
+                <text className="text-white font-bold">
+                  2. You Support Just By Watching:
+                </text>
+                <text className="pl-4 block text-white pb-4">
+                  We track your watch time. The longer you genuinely engage with
+                  a creator’s content, the more of your daily Karma Points they
+                  earn.
+                </text>
+              </view>
+              <view>
+                <text className="text-white font-bold">
+                  3. It’s Automatic and Free for You:
+                </text>
+                <text className="pl-4 block text-white pb-4">
+                  There’s no button to click. When a creator hits engagement
+                  goals through audience watch time, your allocated points are
+                  released to them as real money—you never spend your own cash.
+                </text>
+              </view>
+              <view>
+                <text className="text-white font-bold">
+                  4. Your Attention Has Value:
+                </text>
+                <text className="pl-4 block text-white">
+                  Karma Points directly reward the creators you love most—simply
+                  by giving them your attention.
+                </text>
+              </view>
+            </view>
+          </view>
+        </Popup>
+      )}
     </view>
   );
 }
-
