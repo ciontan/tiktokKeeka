@@ -23,36 +23,39 @@ interface CreatorTier {
 
 const CREATOR_TIERS: CreatorTier[] = [
   {
-    name: "Starter",
+    name: "Unverified",
     minFollowers: 0,
     minLikes: 0,
-    color: "bg-gray-500",
-    benefits: ["Basic profile", "Standard support"],
+    color: "bg-gray-400",
+    benefits: ["Basic profile"],
   },
   {
-    name: "Rising",
+    name: "Bronze",
+    minFollowers: 100,
+    minLikes: 1000,
+    color: "bg-yellow-700",
+    benefits: ["Bronze badge", "Access to analytics"],
+  },
+  {
+    name: "Silver",
     minFollowers: 1000,
     minLikes: 10000,
-    color: "bg-blue-500",
-    benefits: [
-      "Verification eligible",
-      "Priority support",
-      "Analytics dashboard",
-    ],
+    color: "bg-gray-300",
+    benefits: ["Silver badge", "Priority support"],
   },
   {
-    name: "Established",
+    name: "Gold",
     minFollowers: 10000,
     minLikes: 100000,
-    color: "bg-purple-500",
-    benefits: ["Auto verification", "Monetization tools", "Brand partnerships"],
+    color: "bg-yellow-400",
+    benefits: ["Gold badge", "Monetization tools"],
   },
   {
-    name: "Elite",
+    name: "Platinum",
     minFollowers: 100000,
     minLikes: 1000000,
-    color: "bg-gold-500",
-    benefits: ["Premium features", "Dedicated manager", "Exclusive events"],
+    color: "bg-blue-400",
+    benefits: ["Platinum badge", "Exclusive events"],
   },
 ];
 
@@ -71,8 +74,37 @@ export function App() {
     "none" | "pending" | "verified"
   >("none");
 
+  // Page navigation state
+  const [currentPage, setCurrentPage] = useState<"profile" | "verification">(
+    "profile"
+  );
+  const [verificationForm, setVerificationForm] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    category: "",
+    description: "",
+  });
+  const [showCategoryOptions, setShowCategoryOptions] = useState(false);
+
+  const categories = [
+    "Entertainment",
+    "Education",
+    "Music",
+    "Comedy",
+    "Sports",
+    "Fashion",
+    "Food",
+    "Travel",
+    "Tech",
+    "Gaming",
+    "Art",
+    "Business",
+    "Other",
+  ];
+
   useEffect(() => {
-    const tier =
+    let tier =
       CREATOR_TIERS.slice()
         .reverse()
         .find(
@@ -80,14 +112,22 @@ export function App() {
             tiktokStats.followers >= tier.minFollowers &&
             tiktokStats.likes >= tier.minLikes
         ) || CREATOR_TIERS[0];
+    if (verificationStatus === "verified" && tier.name === "Unverified") {
+      tier = CREATOR_TIERS[1];
+    }
     setCurrentTier(tier);
-    const currentIndex = CREATOR_TIERS.indexOf(tier);
-    setNextTier(
-      currentIndex < CREATOR_TIERS.length - 1
-        ? CREATOR_TIERS[currentIndex + 1]
-        : null
-    );
-  }, [tiktokStats]);
+    let currentIndex = CREATOR_TIERS.indexOf(tier);
+
+    if (verificationStatus === "verified" && tier.name === "Bronze") {
+      setNextTier(CREATOR_TIERS[2]);
+    } else {
+      setNextTier(
+        currentIndex < CREATOR_TIERS.length - 1
+          ? CREATOR_TIERS[currentIndex + 1]
+          : null
+      );
+    }
+  }, [tiktokStats, verificationStatus]);
 
   useEffect(() => {
     if (currentTier.name === "Rising" && verificationStatus === "none") {
@@ -104,13 +144,214 @@ export function App() {
   };
 
   const handleVerificationRequest = () => {
-    if (verificationStatus === "none") {
-      setVerificationStatus("pending");
-      setTimeout(() => {
-        setVerificationStatus("verified");
-      }, 3000);
-    }
+    setCurrentPage("verification");
   };
+
+  const handleFormSubmit = () => {
+    if (
+      !verificationForm.fullName ||
+      !verificationForm.email ||
+      !verificationForm.category
+    ) {
+      return;
+    }
+
+    setVerificationStatus("pending");
+    setCurrentPage("profile");
+    setTimeout(() => {
+      setVerificationStatus("verified");
+      setTiktokStats((prev) => ({ ...prev, verified: true }));
+    }, 3000);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setVerificationForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const selectCategory = (category: string) => {
+    handleInputChange("category", category);
+    setShowCategoryOptions(false);
+  };
+
+  const isFormValid =
+    verificationForm.fullName &&
+    verificationForm.email &&
+    verificationForm.category;
+
+  // Verification Page
+  if (currentPage === "verification") {
+    return (
+      <view className="w-full min-h-screen bg-white">
+        <view className="flex items-center justify-between p-4 border-b">
+          <view
+            className="flex items-center cursor-pointer"
+            bindtap={() => setCurrentPage("profile")}
+          >
+            <text className="text-lg mr-2">←</text>
+            <text>Back</text>
+          </view>
+          <text className="text-lg font-bold">Request Verification</text>
+          <view></view>
+        </view>
+        <view className="px-4 py-6">
+          <view className="mb-6 text-center">
+            <text className="text-2xl mb-2">🛡️</text>
+            <text className="text-lg font-bold mb-2">Get Verified</text>
+            <text className="text-gray-600 text-sm">
+              Verification helps build trust with your audience and unlocks
+              additional features.
+            </text>
+          </view>
+
+          <view className="space-y-4">
+            <view>
+              <text className="block text-sm font-medium mb-2">
+                Full Name *
+              </text>
+              <view
+                className="w-full border border-gray-300 rounded px-3 py-3 bg-white cursor-pointer"
+                bindtap={() => handleInputChange("fullName", "Mary Creator")}
+              >
+                <text
+                  className={
+                    verificationForm.fullName ? "text-black" : "text-gray-500"
+                  }
+                >
+                  {verificationForm.fullName || "Tap to enter your full name"}
+                </text>
+              </view>
+            </view>
+
+            <view>
+              <text className="block text-sm font-medium mb-2">Email *</text>
+              <view
+                className="w-full border border-gray-300 rounded px-3 py-3 bg-white cursor-pointer"
+                bindtap={() =>
+                  handleInputChange("email", "creator1@example.com")
+                }
+              >
+                <text
+                  className={
+                    verificationForm.email ? "text-black" : "text-gray-500"
+                  }
+                >
+                  {verificationForm.email || "Tap to enter your email"}
+                </text>
+              </view>
+            </view>
+
+            <view>
+              <text className="block text-sm font-medium mb-2">
+                Phone Number
+              </text>
+              <view
+                className="w-full border border-gray-300 rounded px-3 py-3 bg-white cursor-pointer"
+                bindtap={() => handleInputChange("phoneNumber", "+1234567890")}
+              >
+                <text
+                  className={
+                    verificationForm.phoneNumber
+                      ? "text-black"
+                      : "text-gray-500"
+                  }
+                >
+                  {verificationForm.phoneNumber ||
+                    "Tap to enter your phone number"}
+                </text>
+              </view>
+            </view>
+
+            <view>
+              <text className="block text-sm font-medium mb-2">
+                Content Category *
+              </text>
+              <view
+                className="w-full border border-gray-300 rounded px-3 py-3 bg-white cursor-pointer"
+                bindtap={() => setShowCategoryOptions(!showCategoryOptions)}
+              >
+                <view className="flex justify-between items-center">
+                  <text
+                    className={
+                      verificationForm.category ? "text-black" : "text-gray-500"
+                    }
+                  >
+                    {verificationForm.category ||
+                      "Select your content category"}
+                  </text>
+                  <text className="text-gray-400">
+                    {showCategoryOptions ? "▲" : "▼"}
+                  </text>
+                </view>
+              </view>
+
+              {showCategoryOptions && (
+                <view className="mt-2 border border-gray-300 rounded bg-white max-h-48 overflow-y-auto">
+                  {categories.map((category, index) => (
+                    <view
+                      key={index}
+                      className="px-3 py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
+                      bindtap={() => selectCategory(category)}
+                    >
+                      <text>{category}</text>
+                    </view>
+                  ))}
+                </view>
+              )}
+            </view>
+
+            <view>
+              <text className="block text-sm font-medium mb-2">
+                Description
+              </text>
+              <view
+                className="w-full border border-gray-300 rounded px-3 py-3 bg-white min-h-20 cursor-pointer"
+                bindtap={() =>
+                  handleInputChange(
+                    "description",
+                    "I create engaging content about technology and lifestyle."
+                  )
+                }
+              >
+                <text
+                  className={
+                    verificationForm.description
+                      ? "text-black"
+                      : "text-gray-500"
+                  }
+                >
+                  {verificationForm.description ||
+                    "Tap to add description about your content"}
+                </text>
+              </view>
+            </view>
+
+            <view className="bg-blue-50 p-4 rounded">
+              <text className="text-sm text-blue-800">
+                💡 We'll review your application within 24-48 hours. Make sure
+                all information is accurate.
+              </text>
+            </view>
+          </view>
+
+          <view className="mt-8">
+            <view
+              className={`w-full rounded py-3 text-center ${
+                isFormValid
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-gray-300 text-gray-500"
+              }`}
+              bindtap={isFormValid ? handleFormSubmit : undefined}
+            >
+              <text className="font-medium">Submit Verification Request</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    );
+  }
 
   return (
     <view className="w-full min-h-screen bg-white">
@@ -175,13 +416,33 @@ export function App() {
             <text className="text-gray-400 text-sm">Following</text>
           </view>
           <view className="flex flex-col items-center">
-            <text className="text-2xl font-bold flex items-center gap-1">
+            <text
+              className="text-2xl font-bold flex items-center gap-1 cursor-pointer"
+              bindtap={() => {
+                if (currentTier.name !== "Unverified" && nextTier) {
+                  setTiktokStats((prev) => ({
+                    ...prev,
+                    followers: nextTier.minFollowers,
+                  }));
+                }
+              }}
+            >
               {tiktokStats.followers}
             </text>
             <text className="text-gray-400 text-sm">Followers</text>
           </view>
           <view className="flex flex-col items-center">
-            <text className="text-2xl font-bold flex items-center gap-1">
+            <text
+              className="text-2xl font-bold flex items-center gap-1 cursor-pointer"
+              bindtap={() => {
+                if (currentTier.name !== "Unverified" && nextTier) {
+                  setTiktokStats((prev) => ({
+                    ...prev,
+                    likes: nextTier.minLikes,
+                  }));
+                }
+              }}
+            >
               {tiktokStats.likes}
             </text>
             <text className="text-gray-400 text-sm">Likes</text>
@@ -189,17 +450,14 @@ export function App() {
         </view>
 
         <view className="space-y-3">
-
-          {verificationStatus === "none" && currentTier.name !== "Starter" && (
+          {currentTier.name === "Unverified" && (
             <view
-              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border rounded py-2 text-center"
+              className="w-full bg-blue-300 text-white rounded py-2 px-2 items-center"
               bindtap={handleVerificationRequest}
             >
-              <text className="mr-2">🛡️</text>
-              <text>Request Verification</text>
+              <text className="text-bold text-base">Request Verification</text>
             </view>
           )}
-
         </view>
       </view>
 
@@ -212,8 +470,7 @@ export function App() {
       </view>
 
       <view className="relative h-48 bg-gradient-to-b from-amber-100 to-amber-200">
-        <view className="absolute inset-0 flex items-center justify-center">
-        </view>
+        <view className="absolute inset-0 flex items-center justify-center"></view>
         <view className="absolute bottom-4 left-4 text-white font-medium">
           Tuzi
         </view>
