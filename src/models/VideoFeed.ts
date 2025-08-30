@@ -12,6 +12,7 @@ export class VideoFeed {
   private randomiser: () => number;
   private watchStartTime: number = 0;
   private isWatching: boolean = false;
+  private hasExited: boolean = false; // Add flag to prevent further updates
 
   constructor() {
     this.randomiser = () => Math.floor(Math.random() * 5) + 1; // Random number between 1-5
@@ -35,6 +36,7 @@ export class VideoFeed {
   }
 
   startup(): void {
+    this.hasExited = false; // Reset exit flag
     this.activeVideoIndex = 0;
     this.activeVideo = this.videos[0];
     this.activeCreator =
@@ -43,28 +45,36 @@ export class VideoFeed {
   }
 
   private startWatching(): void {
+    if (this.hasExited) return; // Don't start watching if already exited
+    
     this.isWatching = true;
     this.watchStartTime = Date.now();
     this.duration = 0;
   }
 
   private updateWatchTime(): void {
-    if (this.isWatching && this.watchStartTime > 0) {
-      const currentTime = Date.now();
-      this.duration = (currentTime - this.watchStartTime) / 1000; // Convert to seconds
+    // Don't update if we've exited or not watching
+    if (this.hasExited || !this.isWatching || this.watchStartTime <= 0) {
+      return;
+    }
 
-      if (this.activeVideo) {
-        this.activeVideo.setWatchTime(this.duration);
-      }
+    const currentTime = Date.now();
+    this.duration = (currentTime - this.watchStartTime) / 1000; // Convert to seconds
+
+    if (this.activeVideo) {
+      this.activeVideo.setWatchTime(this.duration);
     }
   }
 
   nextVideo(): void {
+    if (this.hasExited) return; // Don't allow video changes after exit
+    
     this.updateWatchTime();
 
     // Update creator stats
     if (this.activeCreator && this.duration > 0) {
       this.activeCreator.updateDurationWatched(this.duration);
+      console.log(`Updated Creator ${this.activeCreator.getCreatorId()} with ${this.duration.toFixed(2)}s (Total: ${this.activeCreator.getDurationWatched().toFixed(2)}s)`);
     }
 
     // Move to next video
@@ -79,15 +89,26 @@ export class VideoFeed {
   }
 
   exit(): void {
-    this.updateWatchTime();
-
+    console.log("VideoFeed.exit() called");
+    
+    // Set exit flag immediately to prevent further updates
+    this.hasExited = true;
+    this.isWatching = false;
+    
     // Final update for current video
+    this.updateWatchTime();
     if (this.activeCreator && this.duration > 0) {
       this.activeCreator.updateDurationWatched(this.duration);
+      console.log(`Final update for Creator ${this.activeCreator.getCreatorId()} with ${this.duration.toFixed(2)}s (Total: ${this.activeCreator.getDurationWatched().toFixed(2)}s)`);
     }
 
-    this.isWatching = false;
     this.calculatePercentagesAndRewards();
+    
+    // Log final creator stats
+    console.log("Final creator stats:");
+    this.creators.forEach((creator, id) => {
+      console.log(`Creator ${id}: ${creator.getDurationWatched().toFixed(2)}s`);
+    });
   }
 
   private calculatePercentagesAndRewards(): void {
@@ -96,6 +117,8 @@ export class VideoFeed {
     this.creators.forEach((creator) => {
       totalWatchTime += creator.getDurationWatched();
     });
+
+    console.log(`Total watch time: ${totalWatchTime.toFixed(2)}s`);
 
     if (totalWatchTime === 0) {
       return; // No watch time recorded
@@ -108,6 +131,8 @@ export class VideoFeed {
 
       const coinAmount = (percentage / 100) * this.coinCounter;
       creator.setAmount(coinAmount);
+      
+      console.log(`Creator ${creator.getCreatorId()}: ${percentage.toFixed(2)}% = ${coinAmount.toFixed(4)} coins`);
     });
   }
 
@@ -121,7 +146,10 @@ export class VideoFeed {
   }
 
   getCurrentDuration(): number {
-    this.updateWatchTime();
+    // Don't update watch time if we've exited
+    if (!this.hasExited) {
+      this.updateWatchTime();
+    }
     return this.duration;
   }
 
@@ -138,7 +166,7 @@ export class VideoFeed {
   }
 
   isCurrentlyWatching(): boolean {
-    return this.isWatching;
+    return this.isWatching && !this.hasExited;
   }
 
   // Method to get creator stats
@@ -148,5 +176,28 @@ export class VideoFeed {
       stats.set(id, creator.getStats());
     });
     return stats;
+  }
+
+  // Method to check if the feed has exited (useful for debugging)
+  hasExitedSession(): boolean {
+    return this.hasExited;
+  }
+
+  // Method to reset the session (if you want to start over)
+  reset(): void {
+    this.hasExited = false;
+    this.isWatching = false;
+    this.duration = 0;
+    this.watchStartTime = 0;
+    this.activeVideoIndex = 0;
+    
+    // Reset all creator stats
+    this.creators.forEach((creator) => {
+      creator.setDurationWatched(0);
+      creator.setPercentageWatched(0);
+      creator.setAmount(0);
+    });
+    
+    this.startup();
   }
 }
