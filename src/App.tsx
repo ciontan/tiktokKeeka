@@ -579,8 +579,56 @@ export function App() {
 
       {showPopup && (
         <Popup
+          open={showPopup}
           title="Introducing Karma Points"
           onClose={() => setShowPopup(false)}
+          footer={
+            <view
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-end",
+              }}
+            >
+              <view
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "12px",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  marginRight: "10px",
+                }}
+                bindtap={() => alert("Learn more clicked!")}
+                accessibility-element={true}
+                accessibility-traits="button"
+              >
+                <text
+                  style={{ color: "#fff", fontSize: "14px", fontWeight: "600" }}
+                >
+                  Learn more
+                </text>
+              </view>
+              <view
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "12px",
+                  backgroundColor: "#fff",
+                }}
+                bindtap={() => setShowPopup(false)}
+                accessibility-element={true}
+                accessibility-traits="button"
+              >
+                <text
+                  style={{
+                    color: "#FE2C55",
+                    fontSize: "14px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Got it
+                </text>
+              </view>
+            </view>
+          }
         >
           <view style={{ marginBottom: 10 }}>
             <text className="block text-white text-base mb-4">

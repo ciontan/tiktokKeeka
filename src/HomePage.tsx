@@ -141,7 +141,10 @@ export default function HomePage({
           className="absolute top-4 right-4 z-10 cursor-pointer"
           bindtap={handleShowSummary}
         >
-          <text style={{ fontSize: "32px" }}>🪙</text>
+          <image
+            src={require("./assets/chart-bar.png")}
+            style={{ width: 30, height: 30 }}
+          />
         </view>
       )}
 
@@ -174,7 +177,7 @@ export default function HomePage({
             <view
               className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer text-center"
               bindtap={handleSwipe}
-              style={{ minWidth: 120 }}
+              style={{ minWidth: "120" }}
             >
               <text>Next Video (Swipe)</text>
             </view>
