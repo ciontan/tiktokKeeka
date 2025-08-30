@@ -1,4 +1,4 @@
-##TikTok Karma
+## TikTok Karma
 ## Inspiration
 We wanted to rethink how TikTok creators get rewarded — not just by views or likes, but by genuine time and attention from their audiences. Witnessing how some viewers might just scroll through content without actually watching it, or as we call it "doom-scrolling", we decided to come up with a method to encourage content creators to create more long form content that can capture the viewer's attention.
 
