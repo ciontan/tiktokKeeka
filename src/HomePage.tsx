@@ -9,11 +9,13 @@ import { RewardCalculator } from "./models/RewardCalculator.ts";
 interface HomePageProps {
   onHomeClick: () => void;
   onProfileClick: () => void;
+  onPointsPopupClosed?: () => void;
 }
 
 export default function HomePage({
   onHomeClick,
   onProfileClick,
+  onPointsPopupClosed,
 }: HomePageProps) {
   // Centralized backend simulation state
   const [videoFeed] = useState(() => new VideoFeed());
@@ -196,6 +198,7 @@ export default function HomePage({
             handleReturnFromSummary();
             onProfileClick();
           }}
+          onPointsPopupClosed={onPointsPopupClosed}
         />
       )}
       <BottomNavBar onHomeClick={onHomeClick} onProfileClick={onProfileClick} />

@@ -8,22 +8,33 @@ interface SummaryPageProps {
   rewardSummary: string;
   onHomeClick: () => void;
   onProfileClick: () => void;
+  onPointsPopupClosed?: () => void;
 }
 
 export default function SummaryPage({
   rewardSummary,
   onHomeClick,
   onProfileClick,
+  onPointsPopupClosed,
 }: SummaryPageProps) {
   // Show Karma popup on first mount, then PointsPopup after closing
   const [showKarmaPopup, setShowKarmaPopup] = useState(true);
   const [showPointsPopup, setShowPointsPopup] = useState(false);
+  
   useEffect(() => {
     setShowKarmaPopup(true);
     setShowPointsPopup(false);
     console.log("SummaryPage rendered with summary:", rewardSummary);
     console.log("Summary length:", rewardSummary.length);
   }, [rewardSummary]);
+
+  // Handle PointsPopup close - this triggers the 0→5 update in App.tsx
+  const handlePointsPopupClose = () => {
+    setShowPointsPopup(false);
+    if (onPointsPopupClosed) {
+      onPointsPopupClosed();
+    }
+  };
 
   return (
     <view className="w-full min-h-screen bg-white flex flex-col relative">
@@ -39,11 +50,11 @@ export default function SummaryPage({
           setShowPointsPopup(true);
         }}
       />
-      {/* Points Popup */}
+      {/* Points Popup - onClose now triggers the points counter update */}
       <PointsPopup
         open={showPointsPopup}
         points={5}
-        onClose={() => setShowPointsPopup(false)}
+        onClose={handlePointsPopupClose}
       />
 
       {/* Header */}

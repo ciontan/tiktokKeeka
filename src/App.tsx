@@ -13,6 +13,8 @@ import silverBg from "./assets/silver.png";
 import goldBg from "./assets/gold.png";
 import Popup from "./Popup.js";
 import HomePage from "./HomePage.tsx";
+import SummaryPage from "./SummaryPage.tsx"; // Add this import
+import heartHandshake from "./assets/heart-handshake.png";
 
 interface TikTokStats {
   followers: number;
@@ -81,10 +83,11 @@ export function App() {
     "none" | "pending" | "verified"
   >("none");
 
-  // Page navigation state
+  // Page navigation state - add "summary" as an option
   const [currentPage, setCurrentPage] = useState<
-    "profile" | "verification" | "home"
+    "profile" | "verification" | "home" | "summary"
   >("profile");
+
   const [verificationForm, setVerificationForm] = useState({
     fullName: "",
     email: "",
@@ -93,6 +96,14 @@ export function App() {
     description: "",
   });
   const [showCategoryOptions, setShowCategoryOptions] = useState(false);
+
+  // Points state - this will be updated when SummaryPage shows the PointsPopup
+  const [pointsPopupShown, setPointsPopupShown] = useState(false);
+
+  // Mock reward summary for SummaryPage
+  const [rewardSummary] = useState(
+    "You've earned 5 Karma Points today by watching content for 15 minutes!"
+  );
 
   const categories = [
     "Entertainment",
@@ -189,6 +200,12 @@ export function App() {
     verificationForm.category;
 
   const [showPopup, setShowPopup] = useState(true);
+
+  // Function to handle when PointsPopup is CLOSED in SummaryPage
+  const handlePointsPopupClosed = () => {
+    console.log("handlePointsPopupClosed called - updating points to 5");
+    setPointsPopupShown(true);
+  };
 
   if (currentPage === "verification") {
     return (
@@ -375,13 +392,34 @@ export function App() {
       <HomePage
         onHomeClick={() => setCurrentPage("home")}
         onProfileClick={() => setCurrentPage("profile")}
+        onPointsPopupClosed={handlePointsPopupClosed}
+      />
+    );
+  }
+
+  // Add SummaryPage case
+  if (currentPage === "summary") {
+    return (
+      <SummaryPage
+        rewardSummary={rewardSummary}
+        onHomeClick={() => setCurrentPage("home")}
+        onProfileClick={() => setCurrentPage("profile")}
+        onPointsPopupClosed={handlePointsPopupClosed}
       />
     );
   }
 
   return (
-    <view className="w-full min-h-screen bg-white">
+    <view className="w-full min-h-screen bg-white relative">
+      <view className="absolute top-4 right-4 flex flex-row items-center z-20">
+        <view className="ml-2 px-1 py-1 bg-white rounded-full ">
+          <text className="text-[#FE2C55] font-bold">{pointsPopupShown ? 5 : 0}</text>
+        </view>
+        <image src={heartHandshake} style={{ width: 20, height: 20 }} />
+      </view>
+
       <view className="flex justify-between items-center p-4 text-sm font-medium"></view>
+
       <view className="px-4 py-6 text-center">
         <view className="relative inline-block mb-4">
           <image
@@ -613,7 +651,9 @@ export function App() {
                   borderRadius: "12px",
                   backgroundColor: "#fff",
                 }}
-                bindtap={() => setShowPopup(false)}
+                bindtap={() => {
+                  setShowPopup(false);
+                }}
                 accessibility-element={true}
                 accessibility-traits="button"
               >
@@ -651,16 +691,16 @@ export function App() {
                 </text>
                 <text className="pl-4 block text-white pb-4">
                   We track your watch time. The longer you genuinely engage with
-                  a creator’s content, the more of your daily Karma Points they
+                  a creator's content, the more of your daily Karma Points they
                   earn.
                 </text>
               </view>
               <view>
                 <text className="text-white font-bold">
-                  3. It’s Automatic and Free for You:
+                  3. It's Automatic and Free for You:
                 </text>
                 <text className="pl-4 block text-white pb-4">
-                  There’s no button to click. When a creator hits engagement
+                  There's no button to click. When a creator hits engagement
                   goals through audience watch time, your allocated points are
                   released to them as real money—you never spend your own cash.
                 </text>
