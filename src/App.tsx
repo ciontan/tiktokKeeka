@@ -5,7 +5,7 @@ import arrow from "./assets/arrow.png";
 import lynxLogo from "./assets/lynx-logo.png";
 import reactLynxLogo from "./assets/react-logo.png";
 //import PopUp from './PopUp';
-import Popup from './Popup';
+import Popup from './Popup.js';
 
 export function App(props: { onRender?: () => void }) {
   //const [alterLogo, setAlterLogo] = useState(false);
