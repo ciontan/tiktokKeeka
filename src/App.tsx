@@ -10,7 +10,8 @@ import platinumBg from "./assets/platinum.png";
 import bronzeBg from "./assets/bronze.png";
 import silverBg from "./assets/silver.png";
 import goldBg from "./assets/gold.png";
-import Popup from "./Popup.js";
+import IntroKarmaPopup from './IntroKarmaPopup.js';
+import PointsPopup from './PointsPopup.js';
 
 interface TikTokStats {
   followers: number;
@@ -186,7 +187,10 @@ export function App() {
     verificationForm.email &&
     verificationForm.category;
 
-  const [showPopup, setShowPopup] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showPoints, setShowPoints] = useState(false);
+
+
 
   if (currentPage === "verification") {
     return (
@@ -196,15 +200,19 @@ export function App() {
             className="flex items-center cursor-pointer"
             bindtap={() => setCurrentPage("profile")}
           >
-            <text className="text-lg mr-2">←</text>
-            <text>Back</text>
+            <text className="text-lg mr-2 text-black">←</text>
+            <text className="text-black">Back</text>
           </view>
-          <text className="text-lg font-bold ">Request Verification</text>
+          <text className="text-lg font-bold text-black ">
+            Request Verification
+          </text>
           <view></view>
         </view>
         <view className="px-4 py-6">
           <view className="mb-6 text-center">
-            <text className="text-lg font-bold mb-2">Get Verified</text>
+            <text className="text-lg font-bold mb-2 text-black">
+              Get Verified
+            </text>
             <text className="text-gray-600 text-sm">
               Verification helps build trust with your audience and unlocks
               additional features.
@@ -213,7 +221,7 @@ export function App() {
 
           <view className="space-y-4">
             <view>
-              <text className="block text-sm font-medium mb-2">
+              <text className="text-black block text-sm font-medium mt-2">
                 Full Name *
               </text>
               <view
@@ -231,7 +239,9 @@ export function App() {
             </view>
 
             <view>
-              <text className="block text-sm font-medium mb-2">Email *</text>
+              <text className="text-black block text-sm font-medium mt-2">
+                Email *
+              </text>
               <view
                 className="w-full border border-gray-300 rounded px-3 py-3 bg-white cursor-pointer"
                 bindtap={() =>
@@ -249,7 +259,7 @@ export function App() {
             </view>
 
             <view>
-              <text className="block text-sm font-medium mb-2">
+              <text className="text-black block text-sm font-medium mt-2">
                 Phone Number
               </text>
               <view
@@ -270,7 +280,7 @@ export function App() {
             </view>
 
             <view>
-              <text className="block text-sm font-medium mb-2">
+              <text className="block text-black text-sm font-medium mt-2">
                 Content Category *
               </text>
               <view
@@ -293,22 +303,26 @@ export function App() {
               </view>
 
               {showCategoryOptions && (
-                <view className="mt-2 border border-gray-300 rounded bg-white max-h-48 overflow-y-auto">
+                <scroll-view
+                  scroll-y
+                  className="mt-2 border border-gray-300 rounded bg-white"
+                  style={{ maxHeight: "12rem" }}
+                >
                   {categories.map((category, index) => (
                     <view
                       key={index}
                       className="px-3 py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
                       bindtap={() => selectCategory(category)}
                     >
-                      <text>{category}</text>
+                      <text className="text-black">{category}</text>
                     </view>
                   ))}
-                </view>
+                </scroll-view>
               )}
             </view>
 
             <view>
-              <text className="block text-sm font-medium mb-2">
+              <text className="block text-black text-sm font-medium mt-2">
                 Description
               </text>
               <view
@@ -424,7 +438,7 @@ export function App() {
           <view className="flex items-center justify-between mb-2">
             {currentTier.name === "Platinum" ? (
               <view
-                className="font-bold px-2 py-1 rounded flex items-center justify-center"
+                className="font-bold px-2 py-1 rounded flex items-center justify-center w-full"
                 style={{
                   backgroundImage: `url(${platinumBg})`,
                   backgroundSize: "cover",
@@ -440,7 +454,7 @@ export function App() {
               </view>
             ) : currentTier.name === "Gold" ? (
               <view
-                className="font-bold px-2 py-1 rounded flex items-center justify-center"
+                className="font-bold px-2 py-1 rounded flex items-center justify-center w-full"
                 style={{
                   backgroundImage: `url(${goldBg})`,
                   backgroundSize: "cover",
@@ -456,7 +470,7 @@ export function App() {
               </view>
             ) : currentTier.name === "Bronze" ? (
               <view
-                className="font-bold px-2 py-1 rounded flex items-center justify-center"
+                className="font-bold px-2 py-1 rounded flex items-center justify-center w-full"
                 style={{
                   backgroundImage: `url(${bronzeBg})`,
                   backgroundSize: "cover",
@@ -472,7 +486,7 @@ export function App() {
               </view>
             ) : currentTier.name === "Silver" ? (
               <view
-                className="font-bold px-2 py-1 rounded flex items-center justify-center"
+                className="font-bold px-2 py-1 rounded flex items-center justify-center w-full"
                 style={{
                   backgroundImage: `url(${silverBg})`,
                   backgroundSize: "cover",
@@ -488,7 +502,7 @@ export function App() {
               </view>
             ) : currentTier.name === "Unverified" ? (
               <view
-                className={`${currentTier.color} font-bold px-2 py-1 rounded`}
+                className={`${currentTier.color} font-bold px-2 py-1 rounded flex items-center justify-center w-full`}
               >
                 <text className="text-black font-bold">
                   {currentTier.name} Creator
@@ -555,11 +569,11 @@ export function App() {
         <view className="flex justify-around items-center py-2">
           <view className="flex flex-col items-center gap-1">
             <image src={homeLogo} className="w-6 h-6" />
-            <text className="text-xs">Home</text>
+            <text className="text-xs text-gray-500">Home</text>
           </view>
           <view className="flex flex-col items-center gap-1 relative">
             <image src={friendsLogo} className="w-6 h-6" />
-            <text className="text-xs">Friends</text>
+            <text className="text-xs text-gray-500">Friends</text>
             <view className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></view>
           </view>
           <view className="flex items-center">
@@ -567,18 +581,30 @@ export function App() {
           </view>
           <view className="flex flex-col items-center gap-1 relative">
             <image src={inboxLogo} className="w-6 h-6" />
-            <text className="text-xs">Inbox</text>
+            <text className="text-xs text-gray-500">Inbox</text>
             <view className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
               <text className="text-xs text-white">34</text>
             </view>
           </view>
           <view className="flex flex-col items-center gap-1">
             <image src={profileLogo} className="w-6 h-6" />
-            <text className="text-xs font-medium">Profile</text>
+            <text className="text-xs text-gray-500">Profile</text>
           </view>
         </view>
       </view>
+      <IntroKarmaPopup
+        open={showIntro}
+        onClose={() => setShowIntro(false)}
+        onLearnMore={() => console.log('Learn more')}
+        onGotIt={() => { setShowIntro(false); setTimeout(() => setShowPoints(true), 160); }}
+      />
 
+      <PointsPopup
+        open={showPoints}
+        points={5}
+        onClose={() => setShowPoints(false)}
+      />
+      {/* 
       {showPopup && (
         <Popup
           title="Introducing Karma Points"
@@ -632,6 +658,7 @@ export function App() {
           </view>
         </Popup>
       )}
+      <PointsPopup open={showPoints} points={5} onClose={() => setShowPoints(false)} /> */}
     </view>
   );
 }
