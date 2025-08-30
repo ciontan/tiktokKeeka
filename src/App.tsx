@@ -413,7 +413,7 @@ export function App() {
     <view className="w-full min-h-screen bg-white relative">
       <view className="absolute top-4 right-4 flex flex-row items-center z-20">
         <view className="ml-2 px-1 py-1 bg-white rounded-full ">
-          <text className="text-[#FE2C55] font-bold">{pointsPopupShown ? 5 : 0}</text>
+          <text className="text-[#FE2C55] font-bold">{pointsPopupShown ? 0 : 5}</text>
         </view>
         <image src={heartHandshake} style={{ width: 20, height: 20 }} />
       </view>
