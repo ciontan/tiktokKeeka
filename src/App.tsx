@@ -1,6 +1,7 @@
 import { useState, useEffect } from "@lynx-js/react";
 import "./App.css";
 import addLogo from "./assets/add.png";
+import BottomNavBar from "./BottomNavBar.tsx";
 import homeLogo from "./assets/home.png";
 import friendsLogo from "./assets/friends.png";
 import inboxLogo from "./assets/inbox.png";
@@ -11,6 +12,7 @@ import bronzeBg from "./assets/bronze.png";
 import silverBg from "./assets/silver.png";
 import goldBg from "./assets/gold.png";
 import Popup from "./Popup.js";
+import HomePage from "./HomePage.tsx";
 
 interface TikTokStats {
   followers: number;
@@ -80,9 +82,9 @@ export function App() {
   >("none");
 
   // Page navigation state
-  const [currentPage, setCurrentPage] = useState<"profile" | "verification">(
-    "profile"
-  );
+  const [currentPage, setCurrentPage] = useState<
+    "profile" | "verification" | "home"
+  >("profile");
   const [verificationForm, setVerificationForm] = useState({
     fullName: "",
     email: "",
@@ -368,6 +370,15 @@ export function App() {
     );
   }
 
+  if (currentPage === "home") {
+    return (
+      <HomePage
+        onHomeClick={() => setCurrentPage("home")}
+        onProfileClick={() => setCurrentPage("profile")}
+      />
+    );
+  }
+
   return (
     <view className="w-full min-h-screen bg-white">
       <view className="flex justify-between items-center p-4 text-sm font-medium"></view>
@@ -561,40 +572,17 @@ export function App() {
         </view>
       </view>
 
-      <view className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full bg-white border-t border-gray-500 pb-5">
-        <view className="flex justify-around items-center py-2">
-          <view className="flex flex-col items-center gap-1">
-            <image src={homeLogo} className="w-6 h-6" />
-            <text className="text-xs text-gray-500">Home</text>
-          </view>
-          <view className="flex flex-col items-center gap-1 relative">
-            <image src={friendsLogo} className="w-6 h-6" />
-            <text className="text-xs text-gray-500">Friends</text>
-            <view className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></view>
-          </view>
-          <view className="flex items-center">
-            <image src={addLogo} className="w-11 h-8" />
-          </view>
-          <view className="flex flex-col items-center gap-1 relative">
-            <image src={inboxLogo} className="w-6 h-6" />
-            <text className="text-xs text-gray-500">Inbox</text>
-            <view className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <text className="text-xs text-white">34</text>
-            </view>
-          </view>
-          <view className="flex flex-col items-center gap-1">
-            <image src={profileLogo} className="w-6 h-6" />
-            <text className="text-xs text-gray-500">Profile</text>
-          </view>
-        </view>
-      </view>
+      <BottomNavBar
+        onHomeClick={() => setCurrentPage("home")}
+        onProfileClick={() => setCurrentPage("profile")}
+      />
 
       {showPopup && (
         <Popup
           title="Introducing Karma Points"
           onClose={() => setShowPopup(false)}
         >
-          <view style={{ marginBottom: 32 }}>
+          <view style={{ marginBottom: 10 }}>
             <text className="block text-white text-base mb-4">
               Turn your watch time into real support for creators.
             </text>
